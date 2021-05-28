@@ -23,23 +23,36 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "FrameTimer.h"
+#include "Brick.h"
+#include "Ball.h"
 
 class Game
 {
 public:
-	Game( class MainWindow& wnd );
-	Game( const Game& ) = delete;
-	Game& operator=( const Game& ) = delete;
+	Game(class MainWindow& wnd);
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
 	void Go();
 private:
 	void ComposeFrame();
 	void UpdateModel();
+	void LimitBallBrickInteraction(float dt);
 	/********************************/
 	/*  User Functions              */
 	/********************************/
 private:
 	MainWindow& wnd;
 	Graphics gfx;
+	FrameTimer frameTimer;
+	static constexpr int bricksHorizontal = 10;
+	static constexpr int bricksVertical = 8;
+	static constexpr int brickWidth = 50;
+	static constexpr int brickHeight = 20;
+	Brick bricks[bricksHorizontal][bricksVertical];
+	Color colors[5] = { Color(255, 40, 90), Color(55, 240, 90), Color(80, 140, 190), Color(40, 40, 250), Color(100, 100, 100)};
+	Ball ball;
+	RectF walls;
 	/********************************/
 	/*  User Variables              */
 	/********************************/

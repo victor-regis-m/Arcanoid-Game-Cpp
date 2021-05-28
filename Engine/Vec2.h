@@ -15,6 +15,7 @@ public:
 	float GetLengthSq() const;
 	Vec2& Normalize();
 	Vec2 GetNormalized() const;
+	float DotProduct(Vec2& other);
 public:
 	float x;
 	float y;

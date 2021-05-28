@@ -7,7 +7,7 @@ FrameTimer::FrameTimer()
 	last = steady_clock::now();
 }
 
-float FrameTimer::Mark()
+float FrameTimer::deltaTime()
 {
 	const auto old = last;
 	last = steady_clock::now();

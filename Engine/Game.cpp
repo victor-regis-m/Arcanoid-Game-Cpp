@@ -21,11 +21,27 @@
 #include "MainWindow.h"
 #include "Game.h"
 
-Game::Game( MainWindow& wnd )
+Game::Game(MainWindow& wnd)
 	:
-	wnd( wnd ),
-	gfx( wnd )
+	wnd(wnd),
+	gfx(wnd),
+	frameTimer(),
+	ball(Vec2(400,300), Vec2(-400, -300)),
+	walls(0, Graphics::ScreenWidth, 0, Graphics::ScreenHeight)
 {
+	for (int j = 0; j < bricksVertical; j++)
+	{
+		Vec2 startPos = Vec2(120, 30 + j);
+		for (int i = 0; i < bricksHorizontal; i++)
+		{
+			Color c = colors[j%5];
+			Vec2 brickPos = Vec2(brickWidth * (i), brickHeight * (j)) + startPos;
+			bricks[i][j] = Brick(RectF(brickPos, brickWidth, brickHeight), c);
+			startPos += Vec2(2, 0);
+		}
+	}
+
+
 }
 
 void Game::Go()
@@ -38,8 +54,19 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	float dt = frameTimer.deltaTime();
+	ball.Move(dt);
+	ball.DetectWallCollision(walls, dt);
+	for (int i = 0; i < bricksHorizontal; i++)
+		for (int j = 0; j < bricksVertical; j++)
+			ball.DetectBrickCollision(bricks[i][j], dt);
 }
 
 void Game::ComposeFrame()
 {
+	ball.Draw(gfx);
+	for (int i = 0; i < bricksHorizontal; i++)
+		for (int j = 0; j < bricksVertical; j++)
+			bricks[i][j].Draw(gfx);
 }
+

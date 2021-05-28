@@ -62,3 +62,8 @@ Vec2 Vec2::GetNormalized() const
 	}
 	return *this;
 }
+
+float Vec2::DotProduct(Vec2& other)
+{
+	return x * other.x + y * other.y;
+}
