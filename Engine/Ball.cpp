@@ -34,6 +34,8 @@ void Ball::Move(float dt, Paddle& pad)
 	}
 	else
 	{
+		for (int i = 0; i < colliderDefinition; i++)
+			Collider[i].x += (pad.PaddlePos()-position).x;
 		position.x = pad.PaddlePos().x;
 	}
 }

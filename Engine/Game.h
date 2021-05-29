@@ -52,7 +52,7 @@ private:
 	static constexpr int brickHeight = 15;
 	Brick bricks[bricksHorizontal][bricksVertical];
 	Paddle pad;
-	Color colors[5] = { Color(255, 40, 90), Color(55, 240, 90), Color(80, 140, 190), Color(40, 40, 250), Color(100, 100, 100)};
+	Color colors[5] = { Color(210, 40, 90), Color(55, 210, 90), Color(80, 140, 190), Color(40, 40, 210), Color(100, 100, 100)};
 	Ball ball;
 	RectF walls;
 	int livesCounter = 3;

@@ -21,3 +21,7 @@ RectF::RectF(const Vec2& topLeft, const float width, const float height)
 {
 }
 
+RectF RectF::GetExpanded(float offset) const
+{
+	return RectF(left - offset, right + offset, top - offset, bottom + offset);
+}

@@ -68,7 +68,7 @@ void Game::UpdateModel()
 	LimitPaddleToScreen();
 	if (ball.GetYPosition() > Graphics::ScreenHeight - 20)
 	{
-		ball.Copy(Ball{ Vec2(400, 510), Vec2(-200, -150) });
+		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 510), Vec2(-200, -150) });
 		livesCounter--;
 	}
 }

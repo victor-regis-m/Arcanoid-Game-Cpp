@@ -2,14 +2,14 @@
 Brick::Brick(const RectF& rectIn, Color cIn)
 	:
 	rect(rectIn),
-	c(cIn)
+	bev(cIn)
 {
 
 }
 void Brick::Draw(Graphics& gfx)
 {
 	if(!isDestroyed)
-		gfx.DrawRect(rect, c);
+		bev.DrawBeveledBrick(rect.GetExpanded(-padding), bevelSize, gfx);
 }
 
 RectF Brick::GetRect()

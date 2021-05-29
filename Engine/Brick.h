@@ -2,6 +2,8 @@
 #include "RectF.h"
 #include "Colors.h"
 #include "Graphics.h"
+#include "Beveler.h"
+
 class Brick
 {
 public:
@@ -17,6 +19,8 @@ public:
 	void DestroyBrick();
 private:
 	RectF rect;
-	Color c;
+	static constexpr float padding = 0.5f;
+	static constexpr int bevelSize = 3;
+	Beveler bev;
 	bool isDestroyed=false;
 };
