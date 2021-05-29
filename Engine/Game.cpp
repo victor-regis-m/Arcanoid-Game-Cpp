@@ -27,22 +27,20 @@ Game::Game(MainWindow& wnd)
 	gfx(wnd),
 	frameTimer(),
 	ball(Vec2(400,510), Vec2(-200, -150)),
-	walls(0, Graphics::ScreenWidth, 0, Graphics::ScreenHeight),
-	pad(Vec2(400,530))
+	pad(Vec2(400,530)),
+	wall(RectF(150,650,10,590), 10 ,Color(200,100,140))
 {
 	for (int j = 0; j < bricksVertical; j++)
 	{
-		Vec2 startPos = Vec2(120, 30 + j);
+		Vec2 startPos = Vec2(160, 30);
 		for (int i = 0; i < bricksHorizontal; i++)
 		{
 			Color c = colors[j%5];
 			Vec2 brickPos = Vec2(brickWidth * (i), brickHeight * (j)) + startPos;
 			bricks[i][j] = Brick(RectF(brickPos, brickWidth, brickHeight), c);
-			startPos += Vec2(2, 0);
 		}
 	}
-
-
+	walls = wall.GetInnerBounds();
 }
 
 void Game::Go()
@@ -57,6 +55,7 @@ void Game::UpdateModel()
 {
 	float dt = frameTimer.deltaTime();
 	pad.Move(wnd, dt);
+	LimitPaddleToScreen();
 	ball.Move(dt, pad);
 	if (wnd.kbd.KeyIsPressed(VK_SPACE))
 		ball.ThrowBall();
@@ -65,7 +64,6 @@ void Game::UpdateModel()
 		for (int j = 0; j < bricksVertical; j++)
 			ball.DetectBrickCollision(bricks[i][j], dt);
 	ball.DetectPadCollision(pad);
-	LimitPaddleToScreen();
 	if (ball.GetYPosition() > Graphics::ScreenHeight - 20)
 	{
 		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 510), Vec2(-200, -150) });
@@ -73,25 +71,26 @@ void Game::UpdateModel()
 	}
 }
 
-void Game::LimitPaddleToScreen()
-{
-	float padLeftEdge = pad.GetLeftEdgePos();
-	float padRightEdge = pad.GetRightEdgePos();
-	if (padLeftEdge <= 0)
-		pad.AdjustPadPosition(-padLeftEdge);
-	if (padRightEdge >= Graphics::ScreenWidth)
-		pad.AdjustPadPosition(Graphics::ScreenWidth - padRightEdge);
-
-}
-
 void Game::ComposeFrame()
 {
 	ball.Draw(gfx);
+	wall.Draw(gfx);
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
 			bricks[i][j].Draw(gfx);
 	pad.Draw(gfx);
 	for (int i = 0; i < livesCounter; i++)
 		SpriteCodex::DrawBall(Vec2(Graphics::ScreenWidth - 40 - 30 * i, 20), gfx);
+}
+
+void Game::LimitPaddleToScreen()
+{
+	float padLeftEdge = pad.GetLeftEdgePos();
+	float padRightEdge = pad.GetRightEdgePos();
+	if (padLeftEdge <= walls.left)
+		pad.AdjustPadPosition(walls.left - padLeftEdge);
+	if (padRightEdge >= walls.right)
+		pad.AdjustPadPosition(walls.right - padRightEdge);
+
 }
 

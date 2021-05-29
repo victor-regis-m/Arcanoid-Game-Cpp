@@ -27,6 +27,7 @@
 #include "Brick.h"
 #include "Ball.h"
 #include "Paddle.h"
+#include "Wall.h"
 
 class Game
 {
@@ -55,6 +56,7 @@ private:
 	Color colors[5] = { Color(210, 40, 90), Color(55, 210, 90), Color(80, 140, 190), Color(40, 40, 210), Color(100, 100, 100)};
 	Ball ball;
 	RectF walls;
+	Wall wall;
 	int livesCounter = 3;
 	/********************************/
 	/*  User Variables              */
