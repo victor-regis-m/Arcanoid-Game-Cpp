@@ -26,6 +26,7 @@
 #include "FrameTimer.h"
 #include "Brick.h"
 #include "Ball.h"
+#include "Paddle.h"
 
 class Game
 {
@@ -37,7 +38,7 @@ public:
 private:
 	void ComposeFrame();
 	void UpdateModel();
-	void LimitBallBrickInteraction(float dt);
+	void LimitPaddleToScreen();
 	/********************************/
 	/*  User Functions              */
 	/********************************/
@@ -45,14 +46,16 @@ private:
 	MainWindow& wnd;
 	Graphics gfx;
 	FrameTimer frameTimer;
-	static constexpr int bricksHorizontal = 10;
-	static constexpr int bricksVertical = 8;
-	static constexpr int brickWidth = 50;
-	static constexpr int brickHeight = 20;
+	static constexpr int bricksHorizontal = 12;
+	static constexpr int bricksVertical = 9;
+	static constexpr int brickWidth = 40;
+	static constexpr int brickHeight = 15;
 	Brick bricks[bricksHorizontal][bricksVertical];
+	Paddle pad;
 	Color colors[5] = { Color(255, 40, 90), Color(55, 240, 90), Color(80, 140, 190), Color(40, 40, 250), Color(100, 100, 100)};
 	Ball ball;
 	RectF walls;
+	int livesCounter = 3;
 	/********************************/
 	/*  User Variables              */
 	/********************************/

@@ -26,8 +26,9 @@ Game::Game(MainWindow& wnd)
 	wnd(wnd),
 	gfx(wnd),
 	frameTimer(),
-	ball(Vec2(400,300), Vec2(-400, -300)),
-	walls(0, Graphics::ScreenWidth, 0, Graphics::ScreenHeight)
+	ball(Vec2(400,510), Vec2(-200, -150)),
+	walls(0, Graphics::ScreenWidth, 0, Graphics::ScreenHeight),
+	pad(Vec2(400,530))
 {
 	for (int j = 0; j < bricksVertical; j++)
 	{
@@ -55,11 +56,32 @@ void Game::Go()
 void Game::UpdateModel()
 {
 	float dt = frameTimer.deltaTime();
-	ball.Move(dt);
+	pad.Move(wnd, dt);
+	ball.Move(dt, pad);
+	if (wnd.kbd.KeyIsPressed(VK_SPACE))
+		ball.ThrowBall();
 	ball.DetectWallCollision(walls, dt);
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
 			ball.DetectBrickCollision(bricks[i][j], dt);
+	ball.DetectPadCollision(pad);
+	LimitPaddleToScreen();
+	if (ball.GetYPosition() > Graphics::ScreenHeight - 20)
+	{
+		ball.Copy(Ball{ Vec2(400, 510), Vec2(-200, -150) });
+		livesCounter--;
+	}
+}
+
+void Game::LimitPaddleToScreen()
+{
+	float padLeftEdge = pad.GetLeftEdgePos();
+	float padRightEdge = pad.GetRightEdgePos();
+	if (padLeftEdge <= 0)
+		pad.AdjustPadPosition(-padLeftEdge);
+	if (padRightEdge >= Graphics::ScreenWidth)
+		pad.AdjustPadPosition(Graphics::ScreenWidth - padRightEdge);
+
 }
 
 void Game::ComposeFrame()
@@ -68,5 +90,8 @@ void Game::ComposeFrame()
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
 			bricks[i][j].Draw(gfx);
+	pad.Draw(gfx);
+	for (int i = 0; i < livesCounter; i++)
+		SpriteCodex::DrawBall(Vec2(Graphics::ScreenWidth - 40 - 30 * i, 20), gfx);
 }
 

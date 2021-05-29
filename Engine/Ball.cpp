@@ -10,16 +10,32 @@ Ball::Ball(const Vec2& pos, const Vec2& vel)
 		Collider[i] = position + Vec2(radius * cos(2* i * pi / (float)colliderDefinition), radius * sin(2* i * pi / (float)colliderDefinition));
 }
 
+void Ball::Copy(Ball& newBall)
+{
+	position = newBall.position;
+	velocity = newBall.velocity;
+	for (int i = 0; i < colliderDefinition; i++)
+		Collider[i] = newBall.Collider[i];
+	isThrown = newBall.isThrown;
+}
+
 void Ball::Draw(Graphics& gfx)
 {
 	SpriteCodex::DrawBall(position, gfx);
 }
 
-void Ball::Move(float dt)
+void Ball::Move(float dt, Paddle& pad)
 {
-	position += velocity * dt;
-	for (int i = 0; i < colliderDefinition; i++)
-		Collider[i] += velocity * dt;
+	if (isThrown)
+	{
+		position += velocity * dt;
+		for (int i = 0; i < colliderDefinition; i++)
+			Collider[i] += velocity * dt;
+	}
+	else
+	{
+		position.x = pad.PaddlePos().x;
+	}
 }
 
 void Ball::DetectBrickCollision(Brick& brick, float dt)
@@ -69,6 +85,18 @@ void Ball::DetectBrickCollision(Brick& brick, float dt)
 void Ball::BounceOffSurface( Vec2& normal)
 {
 	velocity = velocity - normal*2*normal.DotProduct(velocity);
+	if (velocity.y<25 && velocity.y>-25)
+	{
+		float magnitudeSq = velocity.GetLengthSq();
+		float a = magnitudeSq - 625;
+		int signalY = 1;
+		if (velocity.y <= 0)
+			signalY = -1;
+		int signalX = 1;
+		if (velocity.x <= 0)
+			signalX = -1;
+		velocity = Vec2(signalX * sqrtf(a), signalY * 25);		
+	}
 }
 
 void Ball::DetectWallCollision(RectF& wall, float dt)
@@ -158,6 +186,46 @@ int Ball::LeadingPointSelector()
 			&& (float)upperBoundInt * (pi /(float) colliderDefinition) > velocityAngle)
 			return i;
 	}
+}
+
+void Ball::DetectPadCollision(Paddle& pad)
+{
+	if (velocity.y > 0)
+	{
+		if (pad.isInsidePaddle(Collider[colliderDefinition / 4]))
+		{
+			float newYVelocitySq = velocity.GetLengthSq() -
+				(velocity.x + pad.LastMovement() * pad.ballVelocityGain) * (velocity.x + pad.LastMovement() * pad.ballVelocityGain);
+			if (newYVelocitySq >= 0)
+				velocity = Vec2(velocity.x + pad.LastMovement() * pad.ballVelocityGain, sqrt(newYVelocitySq));
+			BounceOffSurface(Vec2(0, -1));
+		}
+	}
+	else
+	{
+		if (pad.isInsidePaddle(Collider[3 * colliderDefinition / 4]))
+			BounceOffSurface(Vec2(0, 1));
+	}
+	if (velocity.x > 0)
+	{
+		if (pad.isInsidePaddle(Collider[0]))
+			BounceOffSurface(Vec2(-1, 0));
+	}
+	else
+	{
+		if (pad.isInsidePaddle(Collider[colliderDefinition / 2]))
+			BounceOffSurface(Vec2(1, 0));
+	}
+}
+
+float Ball::GetYPosition()
+{
+	return position.y;
+}
+
+void Ball::ThrowBall()
+{
+	isThrown = true;
 }
 
 void Ball::ResetPosition(float dt)

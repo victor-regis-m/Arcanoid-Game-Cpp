@@ -25,12 +25,12 @@ bool Brick::isInsideBrick(const Vec2& point)
 
 bool Brick::isSidewaysColision(const Vec2& center)
 {
-	return center.y > rect.top && center.y < rect.bottom;
+	return center.y > rect.top + 2 && center.y < rect.bottom - 2;
 }
 
 bool Brick::isTopBottomColision(const Vec2& center)
 {
-	return center.x > rect.left && center.x < rect.right;
+	return center.x > rect.left + 2 && center.x < rect.right - 2;
 }
 
 bool Brick::isOnBrickLeft(const Vec2& center)
