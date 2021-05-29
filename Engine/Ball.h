@@ -12,13 +12,13 @@ public:
 	void Copy(Ball& newBall);
 	void Draw(Graphics& gfx);
 	void Move(float dt, Paddle& pad);
-	void DetectBrickCollision(Brick& brick, float dt);
+	bool DetectBrickCollision(Brick& brick, float dt);
 	void ResetPosition( float dt);
 	void BounceOffSurface( Vec2& normal);
-	void DetectWallCollision(RectF& wall, float dt);
+	bool DetectWallCollision(RectF& wall, float dt);
 	void CheckForNormalBrickCollision(Vec2& normal, Brick& brick) const;
 	int LeadingPointSelector();
-	void DetectPadCollision(Paddle& pad);
+	bool DetectPadCollision(Paddle& pad);
 	float GetYPosition();
 	void ThrowBall();
 private:

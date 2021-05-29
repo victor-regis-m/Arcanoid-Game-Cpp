@@ -28,7 +28,9 @@ Game::Game(MainWindow& wnd)
 	frameTimer(),
 	ball(Vec2(400,510), Vec2(-200, -150)),
 	pad(Vec2(400,530)),
-	wall(RectF(150,650,10,590), 10 ,Color(200,100,140))
+	wall(RectF(150,650,10,590), 10 ,Color(200,100,140)),
+	soundPad(L"Sounds\\arkpad.wav"),
+	soundBrick(L"Sounds\\arkbrick.wav")
 {
 	for (int j = 0; j < bricksVertical; j++)
 	{
@@ -59,11 +61,14 @@ void Game::UpdateModel()
 	ball.Move(dt, pad);
 	if (wnd.kbd.KeyIsPressed(VK_SPACE))
 		ball.ThrowBall();
-	ball.DetectWallCollision(walls, dt);
+	if(ball.DetectWallCollision(walls, dt))
+		soundPad.Play();
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
-			ball.DetectBrickCollision(bricks[i][j], dt);
-	ball.DetectPadCollision(pad);
+			if(ball.DetectBrickCollision(bricks[i][j], dt))
+				soundBrick.Play();
+	if(ball.DetectPadCollision(pad))
+		soundPad.Play();
 	if (ball.GetYPosition() > Graphics::ScreenHeight - 20)
 	{
 		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 510), Vec2(-200, -150) });

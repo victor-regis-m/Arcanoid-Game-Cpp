@@ -7,7 +7,7 @@
 class Wall
 {
 public:
-	Wall(const RectF& innerBounds_in, float thickness_in, Color baseColor);
+	Wall(const RectF& innerBoundsIn, float thicknessIn, Color baseColor);
 	const RectF& GetInnerBounds() const;
 	void Draw(Graphics& gfx) const;
 private:

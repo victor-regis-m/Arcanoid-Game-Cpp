@@ -28,6 +28,7 @@
 #include "Ball.h"
 #include "Paddle.h"
 #include "Wall.h"
+#include "Sound.h"
 
 class Game
 {
@@ -58,6 +59,8 @@ private:
 	RectF walls;
 	Wall wall;
 	int livesCounter = 3;
+	Sound soundPad;
+	Sound soundBrick;
 	/********************************/
 	/*  User Variables              */
 	/********************************/

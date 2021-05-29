@@ -40,8 +40,9 @@ void Ball::Move(float dt, Paddle& pad)
 	}
 }
 
-void Ball::DetectBrickCollision(Brick& brick, float dt)
+bool Ball::DetectBrickCollision(Brick& brick, float dt)
 {
+	bool hasCollided = false;
 	int startingPoint = LeadingPointSelector();
 	for (int i = 0; i < colliderDefinition/2 ; i++)
 	{
@@ -56,7 +57,8 @@ void Ball::DetectBrickCollision(Brick& brick, float dt)
 				CheckForNormalBrickCollision(normal, brick);
 				BounceOffSurface(normal);
 				brick.DestroyBrick();
-				return;
+				hasCollided = true;
+				break;
 			}
 			else if (brick.isInsideBrick(Collider[upperBoundInt]))
 			{
@@ -65,7 +67,8 @@ void Ball::DetectBrickCollision(Brick& brick, float dt)
 				CheckForNormalBrickCollision(normal, brick);
 				BounceOffSurface(normal);
 				brick.DestroyBrick();
-				return;
+				hasCollided = true;
+				break;
 			}
 		}
 		else
@@ -77,11 +80,12 @@ void Ball::DetectBrickCollision(Brick& brick, float dt)
 				CheckForNormalBrickCollision(normal, brick);
 				BounceOffSurface(normal);
 				brick.DestroyBrick();
-				return;
+				hasCollided = true;
+				break;
 			}
 		}
 	}
-
+	return hasCollided;
 }
 
 void Ball::BounceOffSurface( Vec2& normal)
@@ -101,28 +105,33 @@ void Ball::BounceOffSurface( Vec2& normal)
 	}
 }
 
-void Ball::DetectWallCollision(RectF& wall, float dt)
+bool Ball::DetectWallCollision(RectF& wall, float dt)
 {
 	if (Collider[colliderDefinition*3/4].y <= wall.top)
 	{
 		ResetPosition(dt);
 		BounceOffSurface(Vec2(0, 1));
+		return true;
 	}
 	if (Collider[colliderDefinition/4].y >= wall.bottom)
 	{
 		ResetPosition(dt);
 		BounceOffSurface(Vec2(0, -1));
+		return true;
 	}
 	if (Collider[colliderDefinition/2].x <= wall.left)
 	{
 		ResetPosition(dt);
 		BounceOffSurface(Vec2(1, 0));
+		return true;
 	}
 	if (Collider[0].x >= wall.right)
 	{
 		ResetPosition(dt);
 		BounceOffSurface(Vec2(-1, 0));
+		return true;
 	}
+	return false;
 }
 
 void Ball::CheckForNormalBrickCollision(Vec2& normal, Brick& brick) const
@@ -190,8 +199,9 @@ int Ball::LeadingPointSelector()
 	}
 }
 
-void Ball::DetectPadCollision(Paddle& pad)
+bool Ball::DetectPadCollision(Paddle& pad)
 {
+	bool hasCollided = false;
 	if (velocity.y > 0)
 	{
 		if (pad.isInsidePaddle(Collider[colliderDefinition / 4]))
@@ -201,23 +211,34 @@ void Ball::DetectPadCollision(Paddle& pad)
 			if (newYVelocitySq >= 0)
 				velocity = Vec2(velocity.x + pad.LastMovement() * pad.ballVelocityGain, sqrt(newYVelocitySq));
 			BounceOffSurface(Vec2(0, -1));
+			hasCollided = true;
 		}
 	}
 	else
 	{
 		if (pad.isInsidePaddle(Collider[3 * colliderDefinition / 4]))
+		{
 			BounceOffSurface(Vec2(0, 1));
+			hasCollided = true;
+		}
 	}
 	if (velocity.x > 0)
 	{
 		if (pad.isInsidePaddle(Collider[0]))
+		{
 			BounceOffSurface(Vec2(-1, 0));
+			hasCollided = true;
+		}
 	}
 	else
 	{
 		if (pad.isInsidePaddle(Collider[colliderDefinition / 2]))
+		{
 			BounceOffSurface(Vec2(1, 0));
+			hasCollided = true;
+		}
 	}
+	return hasCollided;
 }
 
 float Ball::GetYPosition()

@@ -1,10 +1,10 @@
 #include "Wall.h"
 #include <assert.h>
 
-Wall::Wall(const RectF& innerBounds_in, float thickness_in, Color baseColor)
+Wall::Wall(const RectF& innerBoundsIn, float thicknessIn, Color baseColor)
 	:
-	innerBounds(innerBounds_in),
-	thickness(thickness_in),
+	innerBounds(innerBoundsIn),
+	thickness(thicknessIn),
 	bev(baseColor)
 {
 }
