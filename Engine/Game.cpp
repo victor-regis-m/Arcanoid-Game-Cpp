@@ -36,6 +36,8 @@ Game::Game(MainWindow& wnd)
 	leftShot(Vec2(0,0), false),
 	rightShot(Vec2(0,0), false)
 {
+	for (int i = 0; i < 3; i++)
+		tripleBall[i] = Ball(Vec2(0, 0), Vec2(1, 1));
 	for (int j = 0; j < bricksVertical; j++)
 	{
 		Vec2 startPos = Vec2(160, 30);
@@ -63,7 +65,7 @@ void Game::UpdateModel()
 	float dt = frameTimer.deltaTime();
 	pad.Move(wnd, dt);
 	LimitPaddleToScreen();
-	ball.Move(dt, pad);
+	MoveBalls(dt);
 	if (wnd.kbd.KeyIsPressed(VK_SPACE))
 	{
 		if(!ball.GetThownState())
@@ -77,19 +79,9 @@ void Game::UpdateModel()
 	}
 	CheckAmmo();
 	ShotMovement(dt);
-	if(ball.DetectWallCollision(walls, dt))
-		soundPad.Play();
-	if(pad.isWallActive)
-		if (ball.DetectWallCollision(powerupWalls, dt))
-		{
-			soundPad.Play();
-			powerupWallLives--;
-			if (powerupWallLives < 0)
-				pad.isWallActive = false;
-		}
 	CheckBrickDestruction(dt);
-	if(ball.DetectPadCollision(pad))
-		soundPad.Play();
+	BallsWallsCollision(dt);
+	BallPadCollision(dt);
 	CheckForDeath();
 	CheckPowerupPosition();
 	if (powerup.IsActive())
@@ -98,11 +90,12 @@ void Game::UpdateModel()
 		if (pad.PickUpPowerUp(powerup))
 			CheckPowerupType();
 	}
+	TripleBallManager();
 }
 
 void Game::ComposeFrame()
 {
-	ball.Draw(gfx);
+	DrawBalls();
 	wall.Draw(gfx);
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
@@ -144,10 +137,26 @@ void Game::ShowLivesLeft()
 
 void Game::CheckForDeath()
 {
-	if (ball.GetPosition().y > Graphics::ScreenHeight - 35)
+	if (!tripleBallMode)
 	{
-		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 515), Vec2(0,0) });
-		livesCounter--;
+		if (ball.GetPosition().y > Graphics::ScreenHeight - 35)
+		{
+			ball = Ball{ Vec2(pad.PaddlePos().x, 515), Vec2(0,0) };
+			livesCounter--;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (tripleBall[i].GetPosition().y > Graphics::ScreenHeight - 35)
+			{
+				tripleBall[i].isActive = false;
+			}
+		}
+		pad.isTripleBallActive = (tripleBall[0].isActive && tripleBall[1].isActive) 
+			|| (tripleBall[0].isActive && tripleBall[2].isActive)
+			|| (tripleBall[1].isActive && tripleBall[2].isActive);
 	}
 }
 
@@ -194,24 +203,128 @@ void Game::CheckBrickDestruction(float dt)
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
 		{
-			if (ball.DetectBrickCollision(bricks[i][j], dt))
+			if (!tripleBallMode)
 			{
-				soundBrick.Play();
-				if (Powerups::GeneratePowerUp() && !powerup.IsActive())
-					powerup = Powerups(true, bricks[i][j].GetPosition());
+				if (ball.DetectBrickCollision(bricks[i][j], dt))
+				{
+					soundBrick.Play();
+					if (Powerups::GeneratePowerUp() && !powerup.IsActive())
+						powerup = Powerups(true, bricks[i][j].GetPosition());
+				}
+			}
+			else
+			{
+				for(int k = 0; k < 3; k++)
+					if (tripleBall[k].DetectBrickCollision(bricks[i][j], dt) && tripleBall[k].isActive)
+					{
+						soundBrick.Play();
+						if (Powerups::GeneratePowerUp() && !powerup.IsActive())
+							powerup = Powerups(true, bricks[i][j].GetPosition());
+					}
 			}
 			if (rightShot.isActive)
 				if (bricks[i][j].isInsideBrick(rightShot.position))
 				{
 					bricks[i][j].DestroyBrick();
 					rightShot.isActive = false;
+					if (Powerups::GeneratePowerUp() && !powerup.IsActive())
+						powerup = Powerups(true, bricks[i][j].GetPosition());
 				}
 			if (leftShot.isActive)
 				if (bricks[i][j].isInsideBrick(leftShot.position))
 				{
 					bricks[i][j].DestroyBrick();
 					leftShot.isActive = false;
+					if (Powerups::GeneratePowerUp() && !powerup.IsActive())
+						powerup = Powerups(true, bricks[i][j].GetPosition());
 				}
 		}
+}
+
+void Game::TripleBallManager()
+{
+	if (pad.isTripleBallActive && !tripleBallMode)
+	{
+		tripleBallMode = true;
+		tripleBall[0] = Ball(ball.GetPosition(), ball.GetSpeed());
+		tripleBall[1] = Ball(ball.GetPosition(), ball.GetLeftTripleBallSpeed());
+		tripleBall[2] = Ball(ball.GetPosition(), ball.GetRightTripleBallSpeed());
+		for (int i = 0; i < 3; i++)
+		{
+			tripleBall[i].isActive = true;
+			tripleBall[i].ThrowBall();
+		}
+	}
+	if (!pad.isTripleBallActive && tripleBallMode)
+	{
+		tripleBallMode = false;
+		for (int i = 0; i < 3; i++)
+			if (tripleBall[i].isActive)
+				ball = Ball(tripleBall[i].GetPosition(), tripleBall[i].GetSpeed());
+		ball.ThrowBall();
+	}
+}
+
+void Game::DrawBalls()
+{
+	if (tripleBallMode)
+	{
+		for (int i = 0; i < 3; i++)
+			if (tripleBall[i].isActive)
+				tripleBall[i].Draw(gfx);
+	}
+	else
+		ball.Draw(gfx);
+}
+
+void Game::MoveBalls(float dt)
+{
+	if (!tripleBallMode)
+		ball.Move(dt, pad);
+	else
+		for (int i = 0; i < 3; i++)
+			if(tripleBall[i].isActive)
+				tripleBall[i].Move(dt, pad);
+}
+
+void Game::BallsWallsCollision(float dt)
+{
+	if (!tripleBallMode)
+	{
+		if (ball.DetectWallCollision(walls, dt))
+			soundPad.Play();
+		if (pad.isWallActive)
+			if (ball.DetectWallCollision(powerupWalls, dt))
+			{
+				soundPad.Play();
+				powerupWallLives--;
+			}
+	}
+	else
+		for (int i = 0; i < 3; i++)
+		{
+			if (tripleBall[i].DetectWallCollision(walls, dt) && tripleBall[i].isActive)
+				soundPad.Play();
+			if (pad.isWallActive)
+				if (tripleBall[i].DetectWallCollision(powerupWalls, dt))
+				{
+					soundPad.Play();
+					powerupWallLives--;
+				}
+		}
+	if (powerupWallLives <= 0)
+		pad.isWallActive = false;
+}
+void Game::BallPadCollision(float dt)
+{
+	if (!tripleBallMode)
+	{
+		if (ball.DetectPadCollision(pad))
+			soundPad.Play();
+	}
+	else
+		for (int i = 0; i < 3; i++)
+			if (tripleBall[i].DetectPadCollision(pad) && tripleBall[i].isActive)
+				soundPad.Play();
 }
 

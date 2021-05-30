@@ -9,7 +9,8 @@ class Ball
 {
 public:
 	Ball(const Vec2& pos, const Vec2& vel);
-	void Copy(Ball& newBall);
+	Ball() = default;
+	void operator=(Ball& newBall);
 	void Draw(Graphics& gfx);
 	void Move(float dt, Paddle& pad);
 	bool DetectBrickCollision(Brick& brick, float dt);
@@ -24,7 +25,11 @@ public:
 	void SetVelocity(Vec2& vel);
 	void ThrowBall();
 	bool GetThownState();
-	void Deactivate();
+	Vec2 GetSpeed();
+	Vec2 GetLeftTripleBallSpeed();
+	Vec2 GetRightTripleBallSpeed();
+public:
+	bool isActive = true;
 private:
 	const float radius = 7.0f;
 	Vec2 position;
@@ -32,5 +37,5 @@ private:
 	static constexpr int colliderDefinition = 20;
 	Vec2 Collider[colliderDefinition];
 	bool isThrown = false;
-	bool isActive = true;
+	float sqrtHalf = sqrtf(2) / 2;
 };

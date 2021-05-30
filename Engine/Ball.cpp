@@ -10,7 +10,7 @@ Ball::Ball(const Vec2& pos, const Vec2& vel)
 		Collider[i] = position + Vec2(radius * cos(2* i * pi / (float)colliderDefinition), radius * sin(2* i * pi / (float)colliderDefinition));
 }
 
-void Ball::Copy(Ball& newBall)
+void Ball::operator=(Ball& newBall)
 {
 	position = newBall.position;
 	velocity = newBall.velocity;
@@ -256,6 +256,21 @@ void Ball::ThrowBall()
 bool Ball::GetThownState()
 {
 	return isThrown;
+}
+
+Vec2 Ball::GetSpeed()
+{
+	return velocity;
+}
+
+Vec2 Ball::GetLeftTripleBallSpeed()
+{
+	return Vec2(velocity.x * sqrtHalf - velocity.y * sqrtHalf, velocity.x * sqrtHalf + velocity.y * sqrtHalf) ;
+}
+
+Vec2 Ball::GetRightTripleBallSpeed()
+{
+	return Vec2(velocity.x * sqrtHalf + velocity.y * sqrtHalf, -velocity.x * sqrtHalf + velocity.y * sqrtHalf);
 }
 
 void Ball::ResetPosition(float dt)

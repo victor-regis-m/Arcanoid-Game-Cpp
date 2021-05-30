@@ -6,7 +6,7 @@ Powerups::Powerups(bool state, Vec2& spawnPos)
 	position(spawnPos),
 	rd(),
 	gen(rd()),
-	distrib(0, 2),
+	distrib(0,2),
 	type(distrib(gen)),
 	bev(c[type]),
 	rect(position + Vec2(width / 2, height / 2), position - Vec2(width / 2, height / 2))

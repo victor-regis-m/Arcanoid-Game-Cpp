@@ -51,6 +51,11 @@ private:
 	void ShotMovement(float dt);
 	void CheckAmmo();
 	void CheckBrickDestruction(float dt);
+	void TripleBallManager();
+	void DrawBalls();
+	void MoveBalls(float dt);
+	void BallsWallsCollision( float dt);
+	void BallPadCollision(float dt);
 	/********************************/
 	/*  User Functions              */
 	/********************************/
@@ -62,11 +67,12 @@ private:
 	static constexpr int bricksVertical = 9;
 	static constexpr int brickWidth = 40;
 	static constexpr int brickHeight = 15;
-	static constexpr float ballSpeed = 400;
+	static constexpr float ballSpeed = 330;
 	Brick bricks[bricksHorizontal][bricksVertical];
 	Paddle pad;
 	Color colors[5] = { Color(210, 40, 90), Color(55, 210, 90), Color(80, 140, 190), Color(40, 40, 210), Color(100, 100, 100)};
 	Ball ball;
+	Ball tripleBall[3];
 	Wall wall;
 	RectF walls;
 	Wall powerupWall;
@@ -79,6 +85,7 @@ private:
 	Sound soundBrick;
 	Shot leftShot;
 	Shot rightShot;
+	bool tripleBallMode = false;
 	/********************************/
 	/*  User Variables              */
 	/********************************/
