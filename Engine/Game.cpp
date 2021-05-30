@@ -30,7 +30,9 @@ Game::Game(MainWindow& wnd)
 	pad(Vec2(400,530)),
 	wall(RectF(150,650,10,590), 10 ,Color(200,100,140)),
 	soundPad(L"Sounds\\arkpad.wav"),
-	soundBrick(L"Sounds\\arkbrick.wav")
+	soundBrick(L"Sounds\\arkbrick.wav"),
+	powerup(false, Vec2(400,300)),
+	powerupWall(RectF(150, 650, 10, 555), 10, Color(200, 100, 140))
 {
 	for (int j = 0; j < bricksVertical; j++)
 	{
@@ -43,6 +45,7 @@ Game::Game(MainWindow& wnd)
 		}
 	}
 	walls = wall.GetInnerBounds();
+	powerupWalls = powerupWall.GetInnerBounds();
 }
 
 void Game::Go()
@@ -66,13 +69,32 @@ void Game::UpdateModel()
 	}
 	if(ball.DetectWallCollision(walls, dt))
 		soundPad.Play();
+	if(pad.isWallActive)
+		if (ball.DetectWallCollision(powerupWalls, dt))
+		{
+			soundPad.Play();
+			powerupWallLives--;
+			if (powerupWallLives < 0)
+				pad.isWallActive = false;
+		}
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
-			if(ball.DetectBrickCollision(bricks[i][j], dt))
+			if (ball.DetectBrickCollision(bricks[i][j], dt))
+			{
 				soundBrick.Play();
+				if (Powerups::GeneratePowerUp() && !powerup.IsActive())
+					powerup = Powerups(true, bricks[i][j].GetPosition());
+			}
 	if(ball.DetectPadCollision(pad))
 		soundPad.Play();
 	CheckForDeath();
+	CheckPowerupPosition();
+	if (powerup.IsActive())
+	{
+		powerup.Move(dt);
+		if (pad.PickUpPowerUp(powerup))
+			CheckPowerupType();
+	}
 }
 
 void Game::ComposeFrame()
@@ -84,6 +106,9 @@ void Game::ComposeFrame()
 			bricks[i][j].Draw(gfx);
 	pad.Draw(gfx);
 	ShowLivesLeft();
+	powerup.Draw(gfx);
+	if (pad.isWallActive)
+		powerupWall.Draw(gfx);
 }
 
 void Game::LimitPaddleToScreen()
@@ -112,10 +137,30 @@ void Game::ShowLivesLeft()
 
 void Game::CheckForDeath()
 {
-	if (ball.GetPosition().y > Graphics::ScreenHeight - 45)
+	if (ball.GetPosition().y > Graphics::ScreenHeight - 35)
 	{
 		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 515), Vec2(0,0) });
 		livesCounter--;
 	}
+}
+
+void Game::CheckPowerupPosition()
+{
+	if (powerup.GetPosition().y > Graphics::ScreenHeight - 30)
+		powerup.Deactivate();
+}
+
+void Game::CheckPowerupType()
+{
+	int type = powerup.GetType();
+	if (type == 0)
+	{
+		pad.isWallActive = true;
+		powerupWallLives = 3;
+	}
+	else if (type == 1)
+		pad.isTripleBallActive = true;
+	else if (type == 2)
+		pad.isWeaponActive = true;
 }
 

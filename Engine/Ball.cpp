@@ -52,21 +52,13 @@ bool Ball::DetectBrickCollision(Brick& brick, float dt)
 		{
 			if (brick.isInsideBrick(Collider[lowerBoundInt]))
 			{
-				Vec2 normal = (position - Collider[lowerBoundInt]).GetNormalized();
-				ResetPosition(dt);
-				CheckForNormalBrickCollision(normal, brick);
-				BounceOffSurface(normal);
-				brick.DestroyBrick();
+				ProcessBrickCollision(brick, dt, lowerBoundInt);
 				hasCollided = true;
 				break;
 			}
 			else if (brick.isInsideBrick(Collider[upperBoundInt]))
 			{
-				Vec2 normal = (position - Collider[upperBoundInt]).GetNormalized();
-				ResetPosition(dt);
-				CheckForNormalBrickCollision(normal, brick);
-				BounceOffSurface(normal);
-				brick.DestroyBrick();
+				ProcessBrickCollision(brick, dt, upperBoundInt);
 				hasCollided = true;
 				break;
 			}
@@ -75,17 +67,22 @@ bool Ball::DetectBrickCollision(Brick& brick, float dt)
 		{
 			if (brick.isInsideBrick(Collider[lowerBoundInt]))
 			{
-				Vec2 normal = (position - Collider[lowerBoundInt]).GetNormalized();
-				ResetPosition(dt);
-				CheckForNormalBrickCollision(normal, brick);
-				BounceOffSurface(normal);
-				brick.DestroyBrick();
+				ProcessBrickCollision(brick, dt, lowerBoundInt);
 				hasCollided = true;
 				break;
 			}
 		}
 	}
 	return hasCollided;
+}
+
+void Ball::ProcessBrickCollision(Brick& brick, float dt, int index)
+{
+	Vec2 normal = (position - Collider[index]).GetNormalized();
+	ResetPosition(dt);
+	CheckForNormalBrickCollision(normal, brick);
+	BounceOffSurface(normal);
+	brick.DestroyBrick();
 }
 
 void Ball::BounceOffSurface( Vec2& normal)

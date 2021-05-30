@@ -43,6 +43,22 @@ void Paddle::AdjustPadPosition(float difference)
 	position.x += difference;
 }
 
+bool Paddle::PickUpPowerUp(Powerups& pwr)
+{ 
+	int left = position.x - width / 2;
+	int right = position.x + width / 2;
+	int bottom = position.y + height / 2;
+	int top = position.y - height / 2;
+	Vec2 pwrTopLeft = pwr.GetTopLeft();
+	Vec2 pwrBottomRight = pwr.GetBottomRight();
+	if (right > pwrTopLeft.x && left < pwrBottomRight.x && bottom > pwrTopLeft.y && top < pwrBottomRight.y)
+	{
+		pwr.Deactivate();
+		return true;
+	}
+	return false;
+}
+
 int Paddle::LastMovement()
 {
 	if (lastPosition.x > position.x)

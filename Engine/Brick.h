@@ -17,6 +17,7 @@ public:
 	bool isOnBrickLeft(const Vec2& center);
 	bool isOnBrickBottom(const Vec2& center);
 	void DestroyBrick();
+	Vec2 GetPosition();
 private:
 	RectF rect;
 	static constexpr float padding = 0.5f;

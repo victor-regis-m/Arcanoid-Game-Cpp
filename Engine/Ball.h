@@ -13,6 +13,7 @@ public:
 	void Draw(Graphics& gfx);
 	void Move(float dt, Paddle& pad);
 	bool DetectBrickCollision(Brick& brick, float dt);
+	void ProcessBrickCollision(Brick& brick, float dt, int index);
 	void ResetPosition( float dt);
 	void BounceOffSurface( Vec2& normal);
 	bool DetectWallCollision(RectF& wall, float dt);
@@ -23,6 +24,7 @@ public:
 	void SetVelocity(Vec2& vel);
 	void ThrowBall();
 	bool GetThownState();
+	void Deactivate();
 private:
 	const float radius = 7.0f;
 	Vec2 position;
@@ -30,4 +32,5 @@ private:
 	static constexpr int colliderDefinition = 20;
 	Vec2 Collider[colliderDefinition];
 	bool isThrown = false;
+	bool isActive = true;
 };

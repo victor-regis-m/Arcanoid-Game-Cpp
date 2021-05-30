@@ -29,6 +29,7 @@
 #include "Paddle.h"
 #include "Wall.h"
 #include "Sound.h"
+#include "Powerups.h"
 
 class Game
 {
@@ -44,6 +45,8 @@ private:
 	void StartGame();
 	void ShowLivesLeft();
 	void CheckForDeath();
+	void CheckPowerupPosition();
+	void CheckPowerupType();
 	/********************************/
 	/*  User Functions              */
 	/********************************/
@@ -60,9 +63,13 @@ private:
 	Paddle pad;
 	Color colors[5] = { Color(210, 40, 90), Color(55, 210, 90), Color(80, 140, 190), Color(40, 40, 210), Color(100, 100, 100)};
 	Ball ball;
-	RectF walls;
 	Wall wall;
+	RectF walls;
+	Wall powerupWall;
+	RectF powerupWalls;
+	Powerups powerup;
 	int livesCounter = 3;
+	int powerupWallLives;
 	Sound soundPad;
 	Sound soundBrick;
 	/********************************/
