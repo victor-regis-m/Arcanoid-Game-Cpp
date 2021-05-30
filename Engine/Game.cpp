@@ -26,7 +26,7 @@ Game::Game(MainWindow& wnd)
 	wnd(wnd),
 	gfx(wnd),
 	frameTimer(),
-	ball(Vec2(400,510), Vec2(-200, -150)),
+	ball(Vec2(400,515), Vec2(-200, -150)),
 	pad(Vec2(400,530)),
 	wall(RectF(150,650,10,590), 10 ,Color(200,100,140)),
 	soundPad(L"Sounds\\arkpad.wav"),
@@ -60,7 +60,10 @@ void Game::UpdateModel()
 	LimitPaddleToScreen();
 	ball.Move(dt, pad);
 	if (wnd.kbd.KeyIsPressed(VK_SPACE))
-		ball.ThrowBall();
+	{
+		if(!ball.GetThownState())
+			StartGame();
+	}
 	if(ball.DetectWallCollision(walls, dt))
 		soundPad.Play();
 	for (int i = 0; i < bricksHorizontal; i++)
@@ -69,11 +72,7 @@ void Game::UpdateModel()
 				soundBrick.Play();
 	if(ball.DetectPadCollision(pad))
 		soundPad.Play();
-	if (ball.GetYPosition() > Graphics::ScreenHeight - 20)
-	{
-		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 510), Vec2(-200, -150) });
-		livesCounter--;
-	}
+	CheckForDeath();
 }
 
 void Game::ComposeFrame()
@@ -84,8 +83,7 @@ void Game::ComposeFrame()
 		for (int j = 0; j < bricksVertical; j++)
 			bricks[i][j].Draw(gfx);
 	pad.Draw(gfx);
-	for (int i = 0; i < livesCounter; i++)
-		SpriteCodex::DrawBall(Vec2(Graphics::ScreenWidth - 40 - 30 * i, 20), gfx);
+	ShowLivesLeft();
 }
 
 void Game::LimitPaddleToScreen()
@@ -97,5 +95,27 @@ void Game::LimitPaddleToScreen()
 	if (padRightEdge >= walls.right)
 		pad.AdjustPadPosition(walls.right - padRightEdge);
 
+}
+
+void Game::StartGame()
+{
+	Vec2 direction = (Vec2(wnd.mouse.GetPosX(), wnd.mouse.GetPosY()) - ball.GetPosition()).GetNormalized();
+	ball.SetVelocity(direction * ballSpeed);
+	ball.ThrowBall();
+}
+
+void Game::ShowLivesLeft()
+{
+	for (int i = 0; i < livesCounter; i++)
+		SpriteCodex::DrawBall(Vec2(Graphics::ScreenWidth - 40 - 30 * i, 20), gfx);
+}
+
+void Game::CheckForDeath()
+{
+	if (ball.GetPosition().y > Graphics::ScreenHeight - 45)
+	{
+		ball.Copy(Ball{ Vec2(pad.PaddlePos().x, 515), Vec2(0,0) });
+		livesCounter--;
+	}
 }
 

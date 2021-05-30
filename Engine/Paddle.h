@@ -20,7 +20,7 @@ public:
 private:
 	Vec2 position;
 	Vec2 lastPosition;
-	static constexpr int width=100;
-	static constexpr int height=25;
+	static constexpr int width=70;
+	static constexpr int height=15;
 	static constexpr float moveSpeed = 250;
  };

@@ -41,6 +41,9 @@ private:
 	void ComposeFrame();
 	void UpdateModel();
 	void LimitPaddleToScreen();
+	void StartGame();
+	void ShowLivesLeft();
+	void CheckForDeath();
 	/********************************/
 	/*  User Functions              */
 	/********************************/
@@ -52,6 +55,7 @@ private:
 	static constexpr int bricksVertical = 9;
 	static constexpr int brickWidth = 40;
 	static constexpr int brickHeight = 15;
+	static constexpr float ballSpeed = 400;
 	Brick bricks[bricksHorizontal][bricksVertical];
 	Paddle pad;
 	Color colors[5] = { Color(210, 40, 90), Color(55, 210, 90), Color(80, 140, 190), Color(40, 40, 210), Color(100, 100, 100)};

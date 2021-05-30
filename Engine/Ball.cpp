@@ -241,14 +241,24 @@ bool Ball::DetectPadCollision(Paddle& pad)
 	return hasCollided;
 }
 
-float Ball::GetYPosition()
+Vec2 Ball::GetPosition()
 {
-	return position.y;
+	return position;
+}
+
+void Ball::SetVelocity(Vec2& vel)
+{
+	velocity = vel;
 }
 
 void Ball::ThrowBall()
 {
 	isThrown = true;
+}
+
+bool Ball::GetThownState()
+{
+	return isThrown;
 }
 
 void Ball::ResetPosition(float dt)

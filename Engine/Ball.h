@@ -19,8 +19,10 @@ public:
 	void CheckForNormalBrickCollision(Vec2& normal, Brick& brick) const;
 	int LeadingPointSelector();
 	bool DetectPadCollision(Paddle& pad);
-	float GetYPosition();
+	Vec2 GetPosition();
+	void SetVelocity(Vec2& vel);
 	void ThrowBall();
+	bool GetThownState();
 private:
 	const float radius = 7.0f;
 	Vec2 position;

@@ -19,6 +19,7 @@ void Paddle::Move(MainWindow& wnd, float dt)
 void Paddle::Draw(Graphics& gfx)
 {
 	gfx.DrawRect(RectF(position + Vec2(width / 2, height / 2), position - Vec2(width / 2, height / 2)), Color(255,240,200));
+	gfx.DrawRect(RectF(position + Vec2(width / 2.5f, height / 2.5f), position - Vec2(width / 2.5f, height / 2.5f)), Color(220, 180, 100));
 }
 
 float Paddle::GetLeftEdgePos()
