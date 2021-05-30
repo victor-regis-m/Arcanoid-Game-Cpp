@@ -3,6 +3,7 @@
 #include "Colors.h"
 #include "Graphics.h"
 #include "Beveler.h"
+#include "Shot.h"
 
 class Brick
 {
@@ -18,6 +19,7 @@ public:
 	bool isOnBrickBottom(const Vec2& center);
 	void DestroyBrick();
 	Vec2 GetPosition();
+	void GetShot(Shot& shot);
 private:
 	RectF rect;
 	static constexpr float padding = 0.5f;

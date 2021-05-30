@@ -32,7 +32,9 @@ Game::Game(MainWindow& wnd)
 	soundPad(L"Sounds\\arkpad.wav"),
 	soundBrick(L"Sounds\\arkbrick.wav"),
 	powerup(false, Vec2(400,300)),
-	powerupWall(RectF(150, 650, 10, 555), 10, Color(200, 100, 140))
+	powerupWall(RectF(150, 650, 10, 555), 10, Color(200, 100, 140)),
+	leftShot(Vec2(0,0), false),
+	rightShot(Vec2(0,0), false)
 {
 	for (int j = 0; j < bricksVertical; j++)
 	{
@@ -66,7 +68,15 @@ void Game::UpdateModel()
 	{
 		if(!ball.GetThownState())
 			StartGame();
+		if (pad.isWeaponActive && !leftShot.isActive && !rightShot.isActive)
+		{
+			leftShot = Shot(pad.GetLeftCannonPos(), true);
+			rightShot = Shot(pad.GetRightCannonPos(), true);
+			ammoCounter--;
+		}
 	}
+	CheckAmmo();
+	ShotMovement(dt);
 	if(ball.DetectWallCollision(walls, dt))
 		soundPad.Play();
 	if(pad.isWallActive)
@@ -77,14 +87,7 @@ void Game::UpdateModel()
 			if (powerupWallLives < 0)
 				pad.isWallActive = false;
 		}
-	for (int i = 0; i < bricksHorizontal; i++)
-		for (int j = 0; j < bricksVertical; j++)
-			if (ball.DetectBrickCollision(bricks[i][j], dt))
-			{
-				soundBrick.Play();
-				if (Powerups::GeneratePowerUp() && !powerup.IsActive())
-					powerup = Powerups(true, bricks[i][j].GetPosition());
-			}
+	CheckBrickDestruction(dt);
 	if(ball.DetectPadCollision(pad))
 		soundPad.Play();
 	CheckForDeath();
@@ -109,6 +112,10 @@ void Game::ComposeFrame()
 	powerup.Draw(gfx);
 	if (pad.isWallActive)
 		powerupWall.Draw(gfx);
+	if (leftShot.isActive)
+		leftShot.Draw(gfx, walls.top);
+	if (rightShot.isActive)
+		rightShot.Draw(gfx, walls.top);
 }
 
 void Game::LimitPaddleToScreen()
@@ -161,6 +168,50 @@ void Game::CheckPowerupType()
 	else if (type == 1)
 		pad.isTripleBallActive = true;
 	else if (type == 2)
+	{
 		pad.isWeaponActive = true;
+		ammoCounter = 10;
+	}
+}
+
+void Game::ShotMovement(float dt)
+{
+	if (leftShot.isActive)
+		leftShot.Move(dt, walls.top);
+	if (rightShot.isActive)
+		rightShot.Move(dt, walls.top);
+}
+
+void Game::CheckAmmo()
+{
+	if (ammoCounter <= 0)
+		pad.isWeaponActive = false;
+
+}
+
+void Game::CheckBrickDestruction(float dt)
+{
+	for (int i = 0; i < bricksHorizontal; i++)
+		for (int j = 0; j < bricksVertical; j++)
+		{
+			if (ball.DetectBrickCollision(bricks[i][j], dt))
+			{
+				soundBrick.Play();
+				if (Powerups::GeneratePowerUp() && !powerup.IsActive())
+					powerup = Powerups(true, bricks[i][j].GetPosition());
+			}
+			if (rightShot.isActive)
+				if (bricks[i][j].isInsideBrick(rightShot.position))
+				{
+					bricks[i][j].DestroyBrick();
+					rightShot.isActive = false;
+				}
+			if (leftShot.isActive)
+				if (bricks[i][j].isInsideBrick(leftShot.position))
+				{
+					bricks[i][j].DestroyBrick();
+					leftShot.isActive = false;
+				}
+		}
 }
 

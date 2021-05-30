@@ -30,6 +30,7 @@
 #include "Wall.h"
 #include "Sound.h"
 #include "Powerups.h"
+#include "Shot.h"
 
 class Game
 {
@@ -47,6 +48,9 @@ private:
 	void CheckForDeath();
 	void CheckPowerupPosition();
 	void CheckPowerupType();
+	void ShotMovement(float dt);
+	void CheckAmmo();
+	void CheckBrickDestruction(float dt);
 	/********************************/
 	/*  User Functions              */
 	/********************************/
@@ -69,9 +73,12 @@ private:
 	RectF powerupWalls;
 	Powerups powerup;
 	int livesCounter = 3;
+	int ammoCounter;
 	int powerupWallLives;
 	Sound soundPad;
 	Sound soundBrick;
+	Shot leftShot;
+	Shot rightShot;
 	/********************************/
 	/*  User Variables              */
 	/********************************/

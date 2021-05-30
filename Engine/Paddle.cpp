@@ -19,7 +19,13 @@ void Paddle::Move(MainWindow& wnd, float dt)
 void Paddle::Draw(Graphics& gfx)
 {
 	gfx.DrawRect(RectF(position + Vec2(width / 2, height / 2), position - Vec2(width / 2, height / 2)), Color(255,240,200));
-	gfx.DrawRect(RectF(position + Vec2(width / 2.5f, height / 2.5f), position - Vec2(width / 2.5f, height / 2.5f)), Color(220, 180, 100));
+	gfx.DrawRect(RectF(position + Vec2(width / 2.5f, height / 2), position - Vec2(width / 2.5f, height / 2)), Color(220, 180, 100));
+	if (isWeaponActive)
+	{
+		gfx.DrawRect(RectF(position + Vec2(width / 2.4f, -height / 2), position + Vec2(width / 2.2f, -height / 1.3f)), Color(220, 190, 200));
+		gfx.DrawRect(RectF(position - Vec2(width / 2.2f, height / 1.3f), position - Vec2(width / 2.4f, height / 2)), Color(220, 190, 200));
+	}
+		
 }
 
 float Paddle::GetLeftEdgePos()
@@ -72,4 +78,14 @@ int Paddle::LastMovement()
 Vec2 Paddle::PaddlePos()
 {
 	return position;
+}
+
+Vec2 Paddle::GetLeftCannonPos()
+{
+	return position - Vec2(width/2.3f, height/1.5f);
+}
+
+Vec2 Paddle::GetRightCannonPos()
+{
+	return  position + Vec2(width / 2.3f, -height / 1.3f);
 }

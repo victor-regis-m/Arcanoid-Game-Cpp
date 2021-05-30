@@ -153,6 +153,7 @@
     <ClInclude Include="Powerups.h" />
     <ClInclude Include="RectF.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Shot.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="SpriteCodex.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Paddle.cpp" />
     <ClCompile Include="Powerups.cpp" />
     <ClCompile Include="RectF.cpp" />
+    <ClCompile Include="Shot.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpriteCodex.cpp" />
     <ClCompile Include="Vec2.cpp" />

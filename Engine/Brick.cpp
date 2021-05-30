@@ -52,3 +52,9 @@ Vec2 Brick::GetPosition()
 {
 	return Vec2((rect.right + rect.left) / 2, (rect.top + rect.bottom) / 2);
 }
+
+void Brick::GetShot(Shot& shot)
+{
+	if (isInsideBrick(shot.position))
+		isDestroyed = true;
+}

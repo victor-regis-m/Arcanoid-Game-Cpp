@@ -19,6 +19,8 @@ public:
 	int LastMovement();
 	Vec2 PaddlePos();
 	static constexpr float ballVelocityGain = 20;
+	Vec2 GetLeftCannonPos();
+	Vec2 GetRightCannonPos();
 public:
 	bool isWallActive = false;
 	bool isTripleBallActive = false;
@@ -28,6 +30,5 @@ private:
 	Vec2 lastPosition;
 	static constexpr int width=70;
 	static constexpr int height=15;
-	static constexpr float moveSpeed = 250;
-	
+	static constexpr float moveSpeed = 250;	
  };
