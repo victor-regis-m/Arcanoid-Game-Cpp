@@ -31,8 +31,11 @@ Game::Game(MainWindow& wnd)
 	wall(RectF(150,650,10,590), 10 ,Color(200,100,140)),
 	soundPad(L"Sounds\\arkpad.wav"),
 	soundBrick(L"Sounds\\arkbrick.wav"),
+	soundShot(L"Sounds\\laser_shot.wav"),
+	lostLifeSound(L"Sounds\\loss_sound.wav"),
+	gameOverSound(L"Sounds\\game_over.wav"),
 	powerup(false, Vec2(400,300)),
-	powerupWall(RectF(150, 650, 10, 555), 10, Color(200, 100, 140)),
+	powerupWall(RectF(148, 652, 8, 555), 6, Color(200, 100, 140)),
 	leftShot(Vec2(0,0), false),
 	rightShot(Vec2(0,0), false)
 {
@@ -62,40 +65,52 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	float dt = frameTimer.deltaTime();
-	pad.Move(wnd, dt);
-	LimitPaddleToScreen();
-	MoveBalls(dt);
-	if (wnd.kbd.KeyIsPressed(VK_SPACE))
+	if (!gameOver)
 	{
-		if(!ball.GetThownState())
-			StartGame();
-		if (pad.isWeaponActive && !leftShot.isActive && !rightShot.isActive)
+		float dt = frameTimer.deltaTime();
+		pad.Move(wnd, dt);
+		LimitPaddleToScreen();
+		MoveBalls(dt);
+		if (wnd.kbd.KeyIsPressed(VK_SPACE))
 		{
-			leftShot = Shot(pad.GetLeftCannonPos(), true);
-			rightShot = Shot(pad.GetRightCannonPos(), true);
-			ammoCounter--;
+			if (!ball.GetThownState())
+				StartGame();
+			if (pad.isWeaponActive && !leftShot.isActive && !rightShot.isActive)
+			{
+				leftShot = Shot(pad.GetLeftCannonPos(), true);
+				rightShot = Shot(pad.GetRightCannonPos(), true);
+				ammoCounter--;
+				soundShot.Play();
+			}
 		}
+		CheckAmmo();
+		ShotMovement(dt);
+		CheckBrickDestruction(dt);
+		BallsWallsCollision(dt);
+		BallPadCollision(dt);
+		CheckForDeath();
+		CheckPowerupPosition();
+		if (powerup.IsActive())
+		{
+			powerup.Move(dt);
+			if (pad.PickUpPowerUp(powerup))
+				CheckPowerupType();
+		}
+		TripleBallManager();
 	}
-	CheckAmmo();
-	ShotMovement(dt);
-	CheckBrickDestruction(dt);
-	BallsWallsCollision(dt);
-	BallPadCollision(dt);
-	CheckForDeath();
-	CheckPowerupPosition();
-	if (powerup.IsActive())
+	if (gameStarted && gameOver)
 	{
-		powerup.Move(dt);
-		if (pad.PickUpPowerUp(powerup))
-			CheckPowerupType();
+		gameStarted = false;
+		gameOverSound.Play();
 	}
-	TripleBallManager();
 }
 
 void Game::ComposeFrame()
 {
-	DrawBalls();
+	if (!gameOver)
+		DrawBalls();
+	else
+		SpriteCodex::DrawGameOver(340, 300, gfx);
 	wall.Draw(gfx);
 	for (int i = 0; i < bricksHorizontal; i++)
 		for (int j = 0; j < bricksVertical; j++)
@@ -124,6 +139,7 @@ void Game::LimitPaddleToScreen()
 
 void Game::StartGame()
 {
+	gameStarted = true;
 	Vec2 direction = (Vec2(wnd.mouse.GetPosX(), wnd.mouse.GetPosY()) - ball.GetPosition()).GetNormalized();
 	ball.SetVelocity(direction * ballSpeed);
 	ball.ThrowBall();
@@ -141,8 +157,14 @@ void Game::CheckForDeath()
 	{
 		if (ball.GetPosition().y > Graphics::ScreenHeight - 35)
 		{
-			ball = Ball{ Vec2(pad.PaddlePos().x, 515), Vec2(0,0) };
 			livesCounter--;
+			if (livesCounter >= 0)
+			{
+				ball = Ball{ Vec2(pad.PaddlePos().x, 515), Vec2(0,0) };
+				lostLifeSound.Play();
+			}
+			else
+				gameOver = true;
 		}
 	}
 	else
@@ -306,7 +328,7 @@ void Game::BallsWallsCollision(float dt)
 			if (tripleBall[i].DetectWallCollision(walls, dt) && tripleBall[i].isActive)
 				soundPad.Play();
 			if (pad.isWallActive)
-				if (tripleBall[i].DetectWallCollision(powerupWalls, dt))
+				if (tripleBall[i].DetectWallCollision(powerupWalls, dt) && tripleBall[i].isActive)
 				{
 					soundPad.Play();
 					powerupWallLives--;
