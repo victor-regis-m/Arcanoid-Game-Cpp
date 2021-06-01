@@ -14,5 +14,6 @@ The game has the following features:
 Achieve victory by destroying all the bricks!
 
 Developed using the Chili Framework (https://wiki.planetchili.net/index.php/Main_Page)
+
 Thanks to Chili, Fupicat (https://freesound.org/people/Fupicat) and Leszek_Szary(https://freesound.org/people/Leszek_Szary) for the sounds used in the game.
 Thanks to Chili for all visual assets.
