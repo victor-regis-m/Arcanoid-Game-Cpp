@@ -89,3 +89,8 @@ Vec2 Paddle::GetRightCannonPos()
 {
 	return  position + Vec2(width / 2.3f, -height / 1.3f);
 }
+
+void Paddle::SetPos(Vec2& newPos)
+{
+	position = newPos;
+}

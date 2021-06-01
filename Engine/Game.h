@@ -59,6 +59,7 @@ private:
 	void MoveBalls(float dt);
 	void BallsWallsCollision( float dt);
 	void BallPadCollision(float dt);
+	void GameReseter();
 private:
 	MainWindow& wnd;
 	Graphics gfx;
@@ -94,4 +95,6 @@ private:
 	bool gameStarted=false;
 	bool gameOver=false;
 	bool tripleBallMode = false;
+	bool victory = false;
+	float resetScreenTimer;
 };

@@ -18,6 +18,7 @@ public:
 	bool isOnBrickLeft(const Vec2& center);
 	bool isOnBrickBottom(const Vec2& center);
 	void DestroyBrick();
+	void ResetBrick();
 	Vec2 GetPosition();
 	void GetShot(Shot& shot);
 private:

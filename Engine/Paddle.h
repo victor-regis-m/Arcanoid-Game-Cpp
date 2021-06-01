@@ -21,6 +21,7 @@ public:
 	static constexpr float ballVelocityGain = 20;
 	Vec2 GetLeftCannonPos();
 	Vec2 GetRightCannonPos();
+	void SetPos(Vec2& newPos);
 public:
 	bool isWallActive = false;
 	bool isTripleBallActive = false;

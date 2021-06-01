@@ -65,7 +65,13 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	if (!gameOver)
+	if (!gameStarted && !gameOver)
+	{
+		GameReseter();
+		if (wnd.kbd.KeyIsPressed(VK_RETURN))
+			gameStarted = true;
+	}
+	if (!gameOver && gameStarted)
 	{
 		float dt = frameTimer.deltaTime();
 		pad.Move(wnd, dt);
@@ -103,27 +109,42 @@ void Game::UpdateModel()
 		gameStarted = false;
 		gameOverSound.Play();
 	}
+	if (!gameStarted && gameOver)
+	{
+		if (resetScreenTimer <= 6.0f)
+			resetScreenTimer += frameTimer.deltaTime();
+		else
+			gameOver = false;
+	}
 }
 
 void Game::ComposeFrame()
 {
-	if (!gameOver)
-		DrawBalls();
+	if (!gameStarted)
+	{
+		if(!gameOver)
+			SpriteCodex::DrawTitle(340, 240, gfx);
+	}
 	else
+	{
+		if (!gameOver)
+			DrawBalls();
+		wall.Draw(gfx);
+		for (int i = 0; i < bricksHorizontal; i++)
+			for (int j = 0; j < bricksVertical; j++)
+				bricks[i][j].Draw(gfx);
+		pad.Draw(gfx);
+		ShowLivesLeft();
+		powerup.Draw(gfx);
+		if (pad.isWallActive)
+			powerupWall.Draw(gfx);
+		if (leftShot.isActive)
+			leftShot.Draw(gfx, walls.top);
+		if (rightShot.isActive)
+			rightShot.Draw(gfx, walls.top);
+	}
+	if(gameOver)
 		SpriteCodex::DrawGameOver(340, 300, gfx);
-	wall.Draw(gfx);
-	for (int i = 0; i < bricksHorizontal; i++)
-		for (int j = 0; j < bricksVertical; j++)
-			bricks[i][j].Draw(gfx);
-	pad.Draw(gfx);
-	ShowLivesLeft();
-	powerup.Draw(gfx);
-	if (pad.isWallActive)
-		powerupWall.Draw(gfx);
-	if (leftShot.isActive)
-		leftShot.Draw(gfx, walls.top);
-	if (rightShot.isActive)
-		rightShot.Draw(gfx, walls.top);
 }
 
 void Game::LimitPaddleToScreen()
@@ -348,5 +369,21 @@ void Game::BallPadCollision(float dt)
 		for (int i = 0; i < 3; i++)
 			if (tripleBall[i].DetectPadCollision(pad) && tripleBall[i].isActive)
 				soundPad.Play();
+}
+
+void Game::GameReseter()
+{
+	resetScreenTimer = 0;
+	livesCounter = 3;
+	pad.SetPos(Vec2(400, 530));
+	pad.isTripleBallActive = false;
+	pad.isWallActive = false;
+	pad.isWeaponActive = false;
+	victory = false;
+	powerup.Deactivate();
+	for (int i = 0; i < bricksHorizontal; i++)
+		for (int j = 0; j < bricksVertical; j++)
+			bricks[i][j].ResetBrick();
+	ball = Ball(Vec2(400, 515), Vec2(-200, -150));
 }
 
