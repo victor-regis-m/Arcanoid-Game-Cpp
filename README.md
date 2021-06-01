@@ -1,6 +1,6 @@
 # Arkanoid-Game-Cpp
 
-This is my second C++ game project, based on the famous brick breaker game Arkanoid
+This is my second C++ game project, based on the famous brick breaker game Arkanoid, made in order to perfect basic C++ concepts and to practice the Clean Code method in an OOP project.
 
 The game has the following features:
 - Custom physics regarding the ball-brick collision
